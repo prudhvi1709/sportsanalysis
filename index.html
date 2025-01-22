@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sports Buzz Insights</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10/font/bootstrap-icons.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        .narrative {
+            max-width: 40rem;
+        }
+        .btn-custom {
+            margin-right: 0.5rem;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href=".">Sports Buzz Insights</a>
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <div class="nav-item dropdown ms-auto" role="group" aria-label="Toggle dark mode" title="Toggle Dark Mode">
+                    <button class="dark-theme-toggle btn btn-outline-light dropdown-toggle" type="button"
+                        data-bs-toggle="dropdown" aria-expanded="false" aria-label="Toggle theme (auto)">
+                        <i class="bi bi-circle-half"></i>
+                        <span class="d-lg-none ms-2">Toggle theme</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <button class="dropdown-item" data-bs-theme-value="light">
+                                <i class="me-2 bi bi-sun-fill"></i> Light
+                            </button>
+                        </li>
+                        <li>
+                            <button class="dropdown-item" data-bs-theme-value="dark">
+                                <i class="me-2 bi bi-moon-stars-fill"></i> Dark
+                            </button>
+                        </li>
+                        <li>
+                            <button class="dropdown-item" data-bs-theme-value="auto">
+                                <i class="me-2 bi bi-circle-half"></i> Auto
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="mt-5 text-center">Sports Buzz Insights</h1>
+
+        <h2>Upload Excel Files</h2>
+        <input type="file" id="fileInput" accept=".xlsx,.xls" multiple class="form-control mb-3" />
+        <!-- Predefined questions -->
+        <div id="predefinedQuestions" class="mb-3 d-none" style="text-align: center;">
+            <details>
+                <summary>Topic Analysis</summary>
+                <div align="center">
+                    <a href="#" class="question-link" data-question="What are the main topics being discussed?">What are the main topics being discussed?</a><br>
+                    <a href="#" class="question-link" data-question="Are there recurring themes across multiple threads?">Are there recurring themes across multiple threads?</a><br>
+                </div>
+            </details>
+            <details>
+                <summary>Sentiment Analysis</summary>
+                <div align="center">
+                    <a href="#" class="question-link" data-question="What is the overall sentiment?">What is the overall sentiment?</a><br>
+                    <a href="#" class="question-link" data-question="Which topics generate the most intense emotions?">Which topics generate the most intense emotions?</a><br>
+                    <a href="#" class="question-link" data-question="Are sentiments different for fans of opposing teams?">Are sentiments different for fans of opposing teams?</a><br>
+                    <a href="#" class="question-link" data-question="Do sentiments shift closer to the event?">Do sentiments shift closer to the event?</a><br>
+                </div>
+            </details>
+            <details>
+                <summary>Volume Analysis</summary>
+                <div align="center">
+                    <a href="#" class="question-link" data-question="How much discussion is happening?">How much discussion is happening?</a><br>
+                    <a href="#" class="question-link" data-question="What are the peak discussion days/times?">What are the peak discussion days/times?</a><br>
+                    <a href="#" class="question-link" data-question="How does the volume differ across events?">How does the volume differ across events?</a><br>
+                </div>
+            </details>
+            <details>
+                <summary>Predictions and Outcomes</summary>
+                <div align="center">
+                    <a href="#" class="question-link" data-question="What predictions are people making?">What predictions are people making?</a><br>
+                    <a href="#" class="question-link" data-question="Are users forecasting specific outcomes or scores?">Are users forecasting specific outcomes or scores?</a><br>
+                    <a href="#" class="question-link" data-question="How confident are people in their predictions?">How confident are people in their predictions?</a><br>
+                    <a href="#" class="question-link" data-question="Are there debates over likely winners or key players?">Are there debates over likely winners or key players?</a><br>
+                    <a href="#" class="question-link" data-question="Do pre-event sentiments match post-event reactions?">Do pre-event sentiments match post-event reactions?</a><br>
+                    <a href="#" class="question-link" data-question="How do people react after the events compared to their expectations?">How do people react after the events compared to their expectations?</a><br>
+                </div>
+            </details>
+        </div>
+        <h2>Ask Question</h2>
+        <textarea id="question" rows="4" class="form-control mb-3"
+            placeholder="Enter your question about the data..."></textarea>
+        <button id="submitButton" class="btn btn-primary btn-custom">Get Answer</button>
+
+        <div class="mt-4 d-none" id="responseContainer">
+            <h3>Response:</h3>
+            <div id="response" class="response-card mt-3">
+                <div class="spinner-border d-none" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@gramex/ui@0.3/dist/dark-theme.js" type="module"></script>
+    <footer class="my-5 vh-100 d-flex align-items-center justify-content-center">
+        <h1 class="display-6">
+            Designed by
+            <a href="https://gramener.com/"
+                class="text-reset link-offset-3 link-underline link-underline-opacity-25">Gramener</a>
+        </h1>
+    </footer>
+</body>
+
+</html>
