@@ -1,0 +1,199 @@
+{
+  "mlb": {
+    "topic_analysis": [
+      {
+        "question": "What are the main topics being discussed?",
+        "answer": "questions/MLB/q1.md"
+      },
+      {
+        "question": "Are there recurring themes across multiple threads?",
+        "answer": "questions/MLB/q2.md"
+      }
+    ],
+    "sentiment_analysis": [
+      {
+        "question": "What is the overall sentiment?",
+        "answer": "questions/MLB/q3.md"
+      },
+      {
+        "question": "Which topics generate the most intense emotions?",
+        "answer": "questions/MLB/q4.md"
+      },
+      {
+        "question" : "Are sentiments different for fans of opposing teams?",
+        "answer" : "questions/MLB/q5.md"
+      },
+      {
+        "question" : "Do sentiments shift closer to the event?",
+        "answer" : "questions/MLB/q6.md"
+      }
+    ],
+    "volume_Anlaysis" :[
+      {
+        "question" : "How Much Discussion is Happening?",
+        "answer" : "questions/MLB/q7.md"
+      },
+      {
+        "question" : "What are the peak discussions days/times?",
+        "answer" : "questions/MLB/q8.md"
+      }
+    ],
+    "predictions_and outcomes": [
+      {
+        "question" : "What predictions are people making?",
+        "answer" : "questions/MLB/q9.md"
+      },
+      {
+        "question" : "Are users forecasting specific outcomes or scores?",
+        "answer" : "questions/MLB/q10.md"
+      },
+      {
+        "question" : "How confident are people in their predictions?",
+        "answer" : "questions/MLB/q11.md"
+      },
+      {
+        "question" : "Are there debates over likely winners or key players?",
+        "answer" : "questions/MLB/q12.md"
+      },
+      {
+        "question" : "Do pre-event sentiments match post-event reactions?",
+        "answer" : "questions/MLB/q13.md"
+      },{
+        "question" : "How do people react after the events compared to their expectations?",
+        "answer" : "questions/MLB/q14.md"
+      }
+    ]
+  },
+  "nba_christmas": {
+    "topic_analysis": [
+      {
+        "question": "What are the main topics being discussed during NBA Christmas?",
+        "answer": "questions/NBA/q1.md"
+      },
+      {
+        "question": "Are there recurring themes in NBA Christmas discussions?",
+        "answer": "questions/NBA/q2.md"
+      }
+    ],
+    "sentiment_analysis": [
+      {
+        "question": "What is the overall sentiment for NBA Christmas?",
+        "answer": "questions/NBA/q3.md"
+      },
+      {
+        "question": "Which topics generate the most intense emotions?",
+        "answer": "questions/NBA/q4.md"
+      },
+      {
+        "question": "Are sentiments different for fans of opposing teams?",
+        "answer": "questions/NBA/q5.md"
+      },
+      {
+        "question": "Do sentiments shift closer to the event?",
+        "answer": "questions/NBA/q6.md"
+      }
+    ],
+    "volume_Analysis": [
+      {
+        "question": "How Much Discussion is Happening?",
+        "answer": "questions/NBA/q7.md"
+      },
+      {
+        "question": "What are the peak discussions days/times?",
+        "answer": "questions/NBA/q8.md"
+      }
+    ],
+    "predictions_and outcomes": [
+      {
+        "question": "What predictions are people making?",
+        "answer": "questions/NBA/q9.md"
+      },
+      {
+        "question": "Are users forecasting specific outcomes or scores?",
+        "answer": "questions/NBA/q10.md"
+      },
+      {
+        "question": "How confident are people in their predictions?",
+        "answer": "questions/NBA/q11.md"
+      },
+      {
+        "question": "Are there debates over likely winners or key players?",
+        "answer": "questions/NBA/q12.md"
+      },
+      {
+        "question": "Do pre-event sentiments match post-event reactions?",
+        "answer": "questions/NBA/q13.md"
+      },
+      {
+        "question": "How do people react after the events compared to their expectations?",
+        "answer": "questions/NBA/q14.md"
+      }
+    ]
+  },
+  "nfl_playoffs": {
+    "topic_analysis": [
+      {
+        "question": "What are the main topics being discussed during NFL Playoffs?",
+        "answer": "questions/NLF/q1.md"
+      },
+      {
+        "question": "Are there recurring themes in NFL Playoffs discussions?",
+        "answer": "questions/NLF/q2.md"
+      }
+    ],
+    "sentiment_analysis": [
+      {
+        "question": "What is the overall sentiment for NFL Playoffs?",
+        "answer": "questions/NLF/q3.md"
+      },
+      {
+        "question": "Which topics generate the most intense emotions during NFL Playoffs?",
+        "answer": "questions/NLF/q4.md"
+      },
+      {
+        "question": "Are sentiments different for fans of opposing teams?",
+        "answer": "questions/NLF/q5.md"
+      },
+      {
+        "question": "Do sentiments shift closer to the event?",
+        "answer": "questions/NLF/q6.md"
+      }
+    ],
+    "volume_Analysis": [
+      {
+        "question": "How Much Discussion is Happening?",
+        "answer": "questions/NLF/q7.md"
+      },
+      {
+        "question": "What are the peak discussions days/times?",
+        "answer": "questions/NLF/q8.md"
+      }
+    ],
+    "predictions_and outcomes": [
+      {
+        "question": "What predictions are people making?",
+        "answer": "questions/NLF/q9.md"
+      },
+      {
+        "question": "Are users forecasting specific outcomes or scores?",
+        "answer": "questions/NLF/q10.md"
+      },
+      {
+        "question": "How confident are people in their predictions?",
+        "answer": "questions/NLF/q11.md"
+      },
+      {
+        "question": "Are there debates over likely winners or key players?",
+        "answer": "questions/NLF/q12.md"
+      },
+      {
+        "question": "Do pre-event sentiments match post-event reactions?",
+        "answer": "questions/NLF/q13.md"
+      },
+      {
+        "question": "How do people react after the events compared to their expectations?",
+        "answer": "questions/NLF/q14.md"
+      }
+    ]
+  }
+}
