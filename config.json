@@ -1,0 +1,24 @@
+{
+  "mlb": {
+    "topic_analysis": [
+      {
+        "question": "What are the main topics being discussed?",
+        "answer": "questions/q1.md"
+      },
+      {
+        "question": "Are there recurring themes across multiple threads?",
+        "answer": "questions/q2.md"
+      }
+    ],
+    "sentiment_analysis": [
+      {
+        "question": "What is the overall sentiment?",
+        "answer": "questions/q3.md"
+      },
+      {
+        "question": "Which topics generate the most intense emotions?",
+        "answer": "questions/q4.md"
+      }
+    ]
+  }
+}

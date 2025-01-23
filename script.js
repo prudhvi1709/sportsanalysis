@@ -5,7 +5,7 @@ const marked = new Marked();
 
 // System prompt for the LLM
 const SYSTEM_PROMPT = `You are a helpful assistant that analyzes Excel data and answers questions about it.
-Please provide clear and concise answers based on the data provided. ALWAYS respond in markdown`;
+Please provide clear and concise answers based on the data provided. ALWAYS respond in markdown tables`;
 
 // Handle file input
 document.getElementById('fileInput').addEventListener('change', async (e) => {
@@ -71,19 +71,17 @@ function processExcelFile(file) {
 }
 
 // Add event listener when the DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const submitButton = document.getElementById('submitButton');
     if (submitButton) {
         submitButton.addEventListener('click', handleSubmit);
     }
 
-    // Add event listeners to predefined question links
-    document.querySelectorAll('.question-link').forEach(link => {
-        link.addEventListener('click', (event) => {
-            event.preventDefault(); // Prevent default link behavior
-            const question = event.target.getAttribute('data-question');
-            document.getElementById('question').value = question; // Autofill the question
-            submitButton.click(); // Trigger form submission
+    // Update event listener for dataset cards
+    document.querySelectorAll('[data-dataset]').forEach(card => {
+        card.addEventListener('click', async (e) => {
+            e.preventDefault(); // Prevent default link behavior
+            handleDatasetClick(e);
         });
     });
 });
@@ -168,4 +166,79 @@ function formatExcelDataForPrompt(excelData) {
 
         return fileContent;
     }).join('\n\n');
+}
+
+async function handleDatasetClick(event) {
+    const card = event.target.closest('[data-dataset]');
+    if (!card) return;
+    const dataset = card.getAttribute('data-dataset');
+    try {
+        const response = await fetch('config.json');
+        const config = await response.json();
+        const questions = config[dataset];
+
+        // Show questions for the selected dataset
+        const predefinedQuestions = document.getElementById('predefinedQuestions');
+        predefinedQuestions.classList.remove('d-none');
+
+        // Update the questions with markdown links
+        updateQuestionsWithMarkdown(questions);
+    } catch (error) {
+        console.error('Error loading dataset questions:', error);
+    }
+}
+
+function updateQuestionsWithMarkdown(questions) {
+    const container = document.getElementById('predefinedQuestions');
+    container.innerHTML = ''; // Clear existing questions
+    Object.entries(questions).forEach(([category, questionList]) => {
+        const details = document.createElement('details');
+        const summary = document.createElement('summary');
+        summary.textContent = category.replace('_', ' ').toUpperCase();
+        details.appendChild(summary);
+
+        const div = document.createElement('div');
+        div.align = 'center';
+
+        questionList.forEach(item => {
+            const link = document.createElement('a');
+            link.href = '#';
+            link.className = 'question-link-md';
+            link.setAttribute('data-answer-file', item.answer);
+            link.textContent = item.question;
+            // Add click event listener directly to the link
+            link.addEventListener('click', handleMarkdownQuestion);
+            div.appendChild(link);
+            div.appendChild(document.createElement('br'));
+        });
+
+        details.appendChild(div);
+        container.appendChild(details);
+    });
+}
+
+async function handleMarkdownQuestion(event) {
+    event.preventDefault();
+    const answerFile = event.target.getAttribute('data-answer-file');
+
+    try {
+        // Show spinner while loading
+        const responseDiv = document.getElementById('response');
+        const responseContainer = document.getElementById('responseContainer');
+        responseContainer.classList.remove('d-none');
+        responseDiv.innerHTML = '<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>';
+
+        const response = await fetch(answerFile);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const markdownContent = await response.text();
+
+        // Display the markdown content
+        responseDiv.innerHTML = marked.parse(markdownContent);
+    } catch (error) {
+        console.error('Error loading markdown answer:', error);
+        const responseDiv = document.getElementById('response');
+        responseDiv.innerHTML = `<div class="alert alert-danger">Error loading content: ${error.message}</div>`;
+    }
 }
