@@ -26,6 +26,21 @@
         #response th {
             padding: 1rem;
         }
+        .accordion-button:not(.collapsed) {
+            color: var(--bs-primary);
+        }
+        .question-link:hover {
+            background-color: rgba(var(--bs-primary-rgb), 0.1);
+        }
+        .sidebar {
+            margin-top: 16rem;
+        }
+        @media (max-width: 767.98px) {
+            .sidebar {
+                height: auto;
+                margin-top: 6rem; /* Smaller margin for mobile */
+            }
+        }
     </style>
 </head>
 
@@ -62,97 +77,71 @@
         </div>
     </nav>
 
-    <div class="container">
-        <h1 class="mt-5 text-center">Sports Buzz Insights</h1>
-
-        <!-- Add preloaded dataset cards -->
-        <div class="row mb-4">
-            <div class="col-md-4">
-                <a href="#" class="card h-100 text-decoration-none" data-dataset="mlb" style="transition: transform 0.2s; margin-top: 15px;">
-                    <div class="card-body">
-                        <h5 class="card-title">MLB Dataset</h5>
-                        <p class="card-text">Explore pre-analyzed MLB social media insights</p>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar - Moved before main content -->
+            <aside class="col-md-3 col-lg-2 d-none" id="sidebarContainer">
+                <div class="sidebar" id="predefinedQuestions">
+                    <div class="position-sticky pt-3">
+                        <div class="accordion" id="questionsAccordion">
+                            <!-- Questions will be dynamically populated here -->
+                        </div>
                     </div>
-                </a>
-            </div>
-            <div class="col-md-4">
-                <a href="#" class="card h-100 text-decoration-none" data-dataset="nba_christmas" style="transition: transform 0.2s; margin-top: 15px;">
-                    <div class="card-body">
-                        <h5 class="card-title">NBA Christmas Dataset</h5>
-                        <p class="card-text">Explore pre-analyzed NBA Christmas social media insights</p>
+                </div>
+            </aside>
+
+            <!-- Main content -->
+            <main class="col-12 px-md-4" id="mainContent">
+                <h1 class="mt-5 text-center">Sports Buzz Insights</h1>
+
+                <!-- Dataset cards -->
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <a href="#" class="card h-100 text-decoration-none d-flex align-items-center" data-dataset="mlb" style="transition: transform 0.2s; margin-top: 15px;">
+                            <div class="card-body d-flex align-items-center justify-content-center">
+                                <h5 class="card-title text-center mb-0">Yankees Vs Dodgers</h5>
+                            </div>
+                        </a>
                     </div>
-                </a>
-            </div>
-            <div class="col-md-4">
-                <a href="#" class="card h-100 text-decoration-none" data-dataset="nfl_playoffs" style="transition: transform 0.2s; margin-top: 15px;">
-                    <div class="card-body">
-                        <h5 class="card-title">NFL Playoffs Dataset</h5>
-                        <p class="card-text">Explore pre-analyzed NFL Playoffs social media insights</p>
+                    <div class="col-md-4">
+                        <a href="#" class="card h-100 text-decoration-none d-flex align-items-center" data-dataset="nba_christmas" style="transition: transform 0.2s; margin-top: 15px;">
+                            <div class="card-body d-flex align-items-center justify-content-center">
+                                <h5 class="card-title text-center mb-0">Lakers Vs Warriors</h5>
+                            </div>
+                        </a>
                     </div>
-                </a>
-            </div>
-        </div>
+                    <div class="col-md-4">
+                        <a href="#" class="card h-100 text-decoration-none d-flex align-items-center" data-dataset="nfl_playoffs" style="transition: transform 0.2s; margin-top: 15px;">
+                            <div class="card-body d-flex align-items-center justify-content-center">
+                                <h5 class="card-title text-center mb-0">KC Chiefs </h5>
+                            </div>
+                        </a>
+                    </div>
+                </div>
 
+                <!-- Add this new intro container -->
+                <div id="introContainer" class="d-none">
+                    <div id="introContent" class="narrative mx-auto mb-4" style="text-align: left;">
+                        <!-- Intro content will be loaded here -->
+                    </div>
+                </div>
 
-        <!-- <h2>Upload Excel Files</h2> -->
-        <!-- <input type="file" id="fileInput" accept=".xlsx,.xls" multiple class="form-control mb-3" /> -->
-
-        <!-- Add this new section for intro content -->
-        <div id="introContainer" class="mt-4 d-none">
-            <div id="introContent"></div>
-        </div>
-
-        <!-- Predefined questions -->
-        <div id="predefinedQuestions" class="mb-3 d-none" style="text-align: center;">
-            <details>
-                <summary>Topic Analysis</summary>
-                <div align="center">
-                    <a href="#" class="question-link" data-question="What are the main topics being discussed?">What are the main topics being discussed?</a><br>
-                    <a href="#" class="question-link" data-question="Are there recurring themes across multiple threads?">Are there recurring themes across multiple threads?</a><br>
+                <!-- Ask Question section -->
+                <details>
+                    <summary>Ask Anything</summary>
+                    <textarea id="question" rows="4" class="form-control mb-3" placeholder="Ask any questions on the discussions..."></textarea>
+                    <button id="submitButton" class="btn btn-primary btn-custom">Get Answer</button>
+                </details>
+                <!-- Response container -->
+                <div class="mt-4 d-none" id="responseContainer">
+                    <h3>Response:</h3>
+                    <div id="response" class="response-card mt-3">
+                        <div class="spinner-border d-none" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
                 </div>
-            </details>
-            <details>
-                <summary>Sentiment Analysis</summary>
-                <div align="center">
-                    <a href="#" class="question-link" data-question="What is the overall sentiment?">What is the overall sentiment?</a><br>
-                    <a href="#" class="question-link" data-question="Which topics generate the most intense emotions?">Which topics generate the most intense emotions?</a><br>
-                    <a href="#" class="question-link" data-question="Are sentiments different for fans of opposing teams?">Are sentiments different for fans of opposing teams?</a><br>
-                    <a href="#" class="question-link" data-question="Do sentiments shift closer to the event?">Do sentiments shift closer to the event?</a><br>
-                </div>
-            </details>
-            <details>
-                <summary>Volume Analysis</summary>
-                <div align="center">
-                    <a href="#" class="question-link" data-question="How much discussion is happening?">How much discussion is happening?</a><br>
-                    <a href="#" class="question-link" data-question="What are the peak discussion days/times?">What are the peak discussion days/times?</a><br>
-                    <a href="#" class="question-link" data-question="How does the volume differ across events?">How does the volume differ across events?</a><br>
-                </div>
-            </details>
-            <details>
-                <summary>Predictions and Outcomes</summary>
-                <div align="center">
-                    <a href="#" class="question-link" data-question="What predictions are people making?">What predictions are people making?</a><br>
-                    <a href="#" class="question-link" data-question="Are users forecasting specific outcomes or scores?">Are users forecasting specific outcomes or scores?</a><br>
-                    <a href="#" class="question-link" data-question="How confident are people in their predictions?">How confident are people in their predictions?</a><br>
-                    <a href="#" class="question-link" data-question="Are there debates over likely winners or key players?">Are there debates over likely winners or key players?</a><br>
-                    <a href="#" class="question-link" data-question="Do pre-event sentiments match post-event reactions?">Do pre-event sentiments match post-event reactions?</a><br>
-                    <a href="#" class="question-link" data-question="How do people react after the events compared to their expectations?">How do people react after the events compared to their expectations?</a><br>
-                </div>
-            </details>
-        </div>
-        <details>
-        <summary>Ask Question</summary>
-        <textarea id="question" rows="4" class="form-control mb-3"
-            placeholder="Enter your question about the data..."></textarea>
-        <button id="submitButton" class="btn btn-primary btn-custom">Get Answer</button>
-        </details>
-        <div class="mt-4 d-none" id="responseContainer">
-            <h3>Response:</h3>
-            <div id="response" class="response-card mt-3">
-                <div class="spinner-border d-none" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-            </div>
+            </main>
         </div>
     </div>
 

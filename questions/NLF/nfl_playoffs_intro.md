@@ -1,13 +1,18 @@
-# NFL Playoffs
+## NFL Playoffs
 
-## Sentiment Analysis of NBA vs NFL Christmas Discussion
+
+
+<br>
+
 
 The dataset consists of comments discussing the performances of both the NBA and NFL on Christmas, highlighting viewer sentiments regarding the two leagues. After analyzing the comments, we can summarize the overall sentiment for the teams involved.
 
 | Team | Positive Sentiment (%) | Neutral Sentiment (%) | Negative Sentiment (%) |
 |------|------------------------|-----------------------|------------------------|
-| NBA  | 40%                    | 30%                   | 30%                    |
-| NFL  | 35%                    | 25%                   | 40%                    |
+| Lakers  | 40%                    | 30%                   | 30%                    |
+| Warriors | 35%                    | 25%                   | 40%                    |
+
+<br>
 
 ## Overview
 

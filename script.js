@@ -57,10 +57,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Add event listener for dataset cards
     document.querySelectorAll('[data-dataset]').forEach(card => {
         card.addEventListener('click', async (e) => {
-            e.preventDefault(); // Prevent default link behavior
+            e.preventDefault();
             handleDatasetClick(e);
         });
     });
+
+    // Make sure the sidebar is hidden initially
+    const sidebarContainer = document.getElementById('sidebarContainer');
+    if (sidebarContainer) {
+        sidebarContainer.classList.add('d-none');
+    }
 });
 
 // Handle form submission
@@ -137,15 +143,38 @@ function formatExcelDataForPrompt(excelData) {
     }).join('\n\n');
 }
 
-// Add this new function to handle dataset clicks
+// Add a variable to track the selected dataset
+let selectedDataset = null;
+
+// Update handleDatasetClick function
 async function handleDatasetClick(event) {
     const card = event.target.closest('[data-dataset]');
     if (!card) return;
-    const dataset = card.getAttribute('data-dataset');
+
+    // Show the sidebar
+    const sidebarContainer = document.getElementById('sidebarContainer');
+    const mainContent = document.getElementById('mainContent');
+
+    if (sidebarContainer && mainContent) {
+        // Show sidebar
+        sidebarContainer.classList.remove('d-none');
+
+        // Adjust main content width
+        mainContent.classList.remove('col-12');
+        mainContent.classList.add('col-md-9', 'col-lg-10');
+    }
+
+    // Set the selected dataset
+    selectedDataset = card.getAttribute('data-dataset');
+
+    // Add active state to the clicked card and remove from others
+    document.querySelectorAll('[data-dataset]').forEach(card => {
+        card.classList.remove('active');
+    });
+    card.classList.add('active');
 
     const datasetMapping = {
         mlb: {
-            //  add the data as githubusercontent..... once the the demo is done.
             dataFile: 'data/Copy_of_reddit_output_MLB_World_Series_2.xlsx',
             introFile: 'questions/MLB/intro.md'
         },
@@ -157,108 +186,221 @@ async function handleDatasetClick(event) {
             dataFile: 'data/Copy_of_reddit_output_NFL_Playoffs_1.xlsx',
             introFile: 'questions/NLF/nfl_playoffs_intro.md'
         }
-        // Add more datasets here as needed
-        // nba: {
-        //     dataFile: 'data/nba_data.xlsx',
-        //     introFile: 'questions/nba_intro.md'
-        // }
     };
 
     try {
-        // First, display the intro content
-        if (datasetMapping[dataset]?.introFile) {
-            const introContainer = document.getElementById('introContainer');
-            const introContent = document.getElementById('introContent');
+        // First, display the intro content if containers exist
+        const introContainer = document.getElementById('introContainer');
+        const introContent = document.getElementById('introContent');
+
+        if (introContainer && introContent && datasetMapping[selectedDataset]?.introFile) {
             introContainer.classList.remove('d-none');
             introContent.innerHTML = '<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>';
 
-            const introResponse = await fetch(datasetMapping[dataset].introFile);
-            if (introResponse.ok) {
-                const introContent = await introResponse.text();
-                document.getElementById('introContent').innerHTML = marked.parse(introContent);
+            try {
+                const introResponse = await fetch(datasetMapping[selectedDataset].introFile);
+                if (introResponse.ok) {
+                    const introText = await introResponse.text();
+                    introContent.innerHTML = marked.parse(introText);
+                } else {
+                    introContent.innerHTML = '<div class="alert alert-warning">Introduction content not available.</div>';
+                }
+            } catch (introError) {
+                console.warn('Error loading intro:', introError);
+                introContent.innerHTML = '<div class="alert alert-warning">Introduction content not available.</div>';
             }
         }
 
         // Then load the Excel file
-        const response = await fetch(datasetMapping[dataset].dataFile);
+        const response = await fetch(datasetMapping[selectedDataset].dataFile);
         const blob = await response.blob();
-        const file = new File([blob], `${dataset}.xlsx`);
+        const file = new File([blob], `${selectedDataset}.xlsx`);
         const data = await processExcelFile(file);
         excelData = [{
             filename: file.name,
             data: data
         }];
 
-        // Finally, load and process the config file
+        // Load and process the config file
         const configResponse = await fetch('config.json');
         const config = await configResponse.json();
 
         // Get questions for the selected dataset
-        const questions = config[dataset];
+        const questions = config[selectedDataset];
         if (questions) {
-            // Show and update predefined questions
-            const predefinedQuestions = document.getElementById('predefinedQuestions');
-            predefinedQuestions.classList.remove('d-none');
-            updateQuestionsWithMarkdown(questions);
+            // Show and update the sidebar
+            const sidebar = document.getElementById('predefinedQuestions');
+            if (sidebar) {
+                updateQuestionsWithMarkdown(questions);
+                // Show the sidebar after updating the content
+                sidebar.classList.remove('d-none');
+            }
         }
     } catch (error) {
         console.error('Error loading dataset, intro, or config:', error);
-        const introContent = document.getElementById('introContent');
-        introContent.innerHTML = `<div class="alert alert-danger">Error loading content: ${error.message}</div>`;
+        const errorContainer = document.getElementById('introContent') || document.getElementById('response');
+        if (errorContainer) {
+            errorContainer.innerHTML = `<div class="alert alert-danger">Error loading content: ${error.message}</div>`;
+        }
     }
 }
 
 function updateQuestionsWithMarkdown(questions) {
-    const container = document.getElementById('predefinedQuestions');
-    container.innerHTML = ''; // Clear existing questions
+    // Map category names to their accordion IDs
+    const categoryMapping = {
+        'topic_analysis': 'topics',
+        'sentiment_analysis': 'sentiment',
+        'volume_analysis': 'volume',
+        'predictions_and outcomes': 'predictions'
+    };
+
     Object.entries(questions).forEach(([category, questionList]) => {
-        const details = document.createElement('details');
-        const summary = document.createElement('summary');
-        summary.textContent = category.replace('_', ' ').toUpperCase();
-        details.appendChild(summary);
+        // Get the base category name by removing '_analysis' and converting to proper case
+        const baseCategory = category.toLowerCase()
+            .replace('_analysis', '')
+            .split('_')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
 
-        const div = document.createElement('div');
-        div.align = 'center';
+        // Get the correct accordion ID from the mapping
+        const accordionId = categoryMapping[category.toLowerCase()];
+        const accordionSection = document.getElementById(accordionId);
 
-        questionList.forEach(item => {
-            const link = document.createElement('a');
-            link.href = '#';
-            link.className = 'question-link-md';
-            link.setAttribute('data-answer-file', item.answer);
-            link.textContent = item.question;
-            // Add click event listener directly to the link
-            link.addEventListener('click', handleMarkdownQuestion);
-            div.appendChild(link);
-            div.appendChild(document.createElement('br'));
-        });
+        if (accordionSection) {
+            const linksContainer = accordionSection.querySelector('.d-grid');
+            if (linksContainer) {
+                // Clear existing links in this category
+                linksContainer.innerHTML = '';
 
-        details.appendChild(div);
-        container.appendChild(details);
+                // Add new links
+                questionList.forEach(item => {
+                    const link = document.createElement('a');
+                    link.href = '#';
+                    link.className = 'question-link btn btn-outline-primary text-start';
+                    link.textContent = item.question;
+                    link.setAttribute('data-answer-file', item.answer);
+
+                    link.addEventListener('click', async (e) => {
+                        e.preventDefault();
+                        await handleMarkdownQuestion(e);
+                    });
+
+                    linksContainer.appendChild(link);
+                });
+            }
+        }
     });
 }
 
+// Update handleMarkdownQuestion to check for selected dataset
 async function handleMarkdownQuestion(event) {
     event.preventDefault();
-    const answerFile = event.target.getAttribute('data-answer-file');
 
-    try {
-        const responseDiv = document.getElementById('response');
-        const responseContainer = document.getElementById('responseContainer');
+    if (!selectedDataset) {
+        alert('Please select a dataset first by clicking on one of the cards.');
+        return;
+    }
+
+    const link = event.target;
+    const answerFile = link.getAttribute('data-answer-file');
+
+    if (!answerFile) {
+        console.error('No answer file path found');
+        return;
+    }
+
+    const responseDiv = document.getElementById('response');
+    const responseContainer = document.getElementById('responseContainer');
+
+    if (responseContainer) {
         responseContainer.classList.remove('d-none');
+    }
 
-        // Use the constant
+    if (responseDiv) {
         responseDiv.innerHTML = SPINNER_HTML;
 
-        const response = await fetch(answerFile);
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+        try {
+            const response = await fetch(answerFile);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const markdownContent = await response.text();
+            responseDiv.innerHTML = marked.parse(markdownContent);
+        } catch (error) {
+            console.error('Error loading markdown answer:', error);
+            responseDiv.innerHTML = `<div class="alert alert-danger">
+                Error loading content: ${error.message}
+            </div>`;
         }
-        const markdownContent = await response.text();
-
-        // Display the markdown content
-        responseDiv.innerHTML = marked.parse(markdownContent);
-    } catch (error) {
-        console.error('Error loading markdown answer:', error);
-        responseDiv.innerHTML = `<div class="alert alert-danger">Error loading content: ${error.message}</div>`;
     }
 }
+
+// Add some CSS for the active card state
+const style = document.createElement('style');
+document.head.appendChild(style);
+
+async function loadQuestionsFromConfig(dataset) {
+    const response = await fetch('config.json');
+    const config = await response.json();
+    const datasetConfig = config[dataset];
+
+    const accordion = document.getElementById('questionsAccordion');
+    accordion.innerHTML = ''; // Clear existing questions
+
+    // Create accordion items for each category
+    for (const [category, questions] of Object.entries(datasetConfig)) {
+        const categoryId = category.replace(/\s+/g, '');
+        // Remove '_analysis' and format the category name
+        const formattedCategory = category.toLowerCase()
+            .replace('_analysis', '')
+            .split('_')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+
+        const accordionItem = `
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#${categoryId}">
+                        ${formattedCategory}
+                    </button>
+                </h2>
+                <div id="${categoryId}" class="accordion-collapse collapse"
+                     data-bs-parent="#questionsAccordion">
+                    <div class="accordion-body">
+                        <div class="d-grid gap-2">
+                            ${questions.map(q => `
+                                <a href="#" class="question-link btn btn-outline-primary text-start"
+                                   data-question="${q.question}"
+                                   data-answer-file="${q.answer}">
+                                    ${q.question}
+                                </a>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        accordion.innerHTML += accordionItem;
+    }
+
+    // Add click event listeners to the newly created question links
+    document.querySelectorAll('.question-link').forEach(link => {
+        link.addEventListener('click', async (e) => {
+            e.preventDefault();
+            await handleMarkdownQuestion(e);
+        });
+    });
+}
+
+// Call this function when a dataset is selected
+document.querySelectorAll('[data-dataset]').forEach(card => {
+    card.addEventListener('click', (e) => {
+        e.preventDefault();
+        const dataset = e.currentTarget.dataset.dataset;
+        loadQuestionsFromConfig(dataset);
+        // ... rest of your dataset selection logic
+    });
+});
