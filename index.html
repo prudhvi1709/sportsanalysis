@@ -68,17 +68,40 @@
         <!-- Add preloaded dataset cards -->
         <div class="row mb-4">
             <div class="col-md-4">
-                <a href="#" class="card h-100 text-decoration-none" data-dataset="mlb" style="transition: transform 0.2s;">
+                <a href="#" class="card h-100 text-decoration-none" data-dataset="mlb" style="transition: transform 0.2s; margin-top: 15px;">
                     <div class="card-body">
                         <h5 class="card-title">MLB Dataset</h5>
                         <p class="card-text">Explore pre-analyzed MLB social media insights</p>
                     </div>
                 </a>
             </div>
+            <div class="col-md-4">
+                <a href="#" class="card h-100 text-decoration-none" data-dataset="nba_christmas" style="transition: transform 0.2s; margin-top: 15px;">
+                    <div class="card-body">
+                        <h5 class="card-title">NBA Christmas Dataset</h5>
+                        <p class="card-text">Explore pre-analyzed NBA Christmas social media insights</p>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a href="#" class="card h-100 text-decoration-none" data-dataset="nfl_playoffs" style="transition: transform 0.2s; margin-top: 15px;">
+                    <div class="card-body">
+                        <h5 class="card-title">NFL Playoffs Dataset</h5>
+                        <p class="card-text">Explore pre-analyzed NFL Playoffs social media insights</p>
+                    </div>
+                </a>
+            </div>
         </div>
 
-        <h2>Upload Excel Files</h2>
-        <input type="file" id="fileInput" accept=".xlsx,.xls" multiple class="form-control mb-3" />
+
+        <!-- <h2>Upload Excel Files</h2> -->
+        <!-- <input type="file" id="fileInput" accept=".xlsx,.xls" multiple class="form-control mb-3" /> -->
+
+        <!-- Add this new section for intro content -->
+        <div id="introContainer" class="mt-4 d-none">
+            <div id="introContent"></div>
+        </div>
+
         <!-- Predefined questions -->
         <div id="predefinedQuestions" class="mb-3 d-none" style="text-align: center;">
             <details>
@@ -117,11 +140,12 @@
                 </div>
             </details>
         </div>
-        <h2>Ask Question</h2>
+        <details>
+        <summary>Ask Question</summary>
         <textarea id="question" rows="4" class="form-control mb-3"
             placeholder="Enter your question about the data..."></textarea>
         <button id="submitButton" class="btn btn-primary btn-custom">Get Answer</button>
-
+        </details>
         <div class="mt-4 d-none" id="responseContainer">
             <h3>Response:</h3>
             <div id="response" class="response-card mt-3">

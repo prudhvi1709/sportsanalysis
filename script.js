@@ -7,33 +7,10 @@ const marked = new Marked();
 const SYSTEM_PROMPT = `You are a helpful assistant that analyzes Excel data and answers questions about it.
 Please provide clear and concise answers based on the data provided. ALWAYS respond in markdown tables`;
 
-// Handle file input
-document.getElementById('fileInput').addEventListener('change', async (e) => {
-    excelData = [];
-    const files = e.target.files;
-
-    for (let file of files) {
-        try {
-            const data = await processExcelFile(file);
-            excelData.push({
-                filename: file.name,
-                data: data
-            });
-        } catch (error) {
-            console.error('Error reading file:', error);
-            alert('Error reading Excel file');
-        }
-    }
-
-    const fileInput = document.getElementById('fileInput');
-    const predefinedQuestions = document.getElementById('predefinedQuestions');
-
-    if (fileInput.files.length > 0) {
-        predefinedQuestions.classList.remove('d-none'); // Show questions if files are uploaded
-    } else {
-        predefinedQuestions.classList.add('d-none'); // Hide questions if no files are uploaded
-    }
-});
+const SPINNER_HTML = `
+    <div class="spinner-border text-primary" role="status">
+        <span class="d-none">Loading...</span>
+    </div>`;
 
 // Read Excel file
 function processExcelFile(file) {
@@ -70,14 +47,14 @@ function processExcelFile(file) {
     });
 }
 
-// Add event listener when the DOM is loaded
+// Update the DOMContentLoaded event listener
 document.addEventListener('DOMContentLoaded', async () => {
     const submitButton = document.getElementById('submitButton');
     if (submitButton) {
         submitButton.addEventListener('click', handleSubmit);
     }
 
-    // Update event listener for dataset cards
+    // Add event listener for dataset cards
     document.querySelectorAll('[data-dataset]').forEach(card => {
         card.addEventListener('click', async (e) => {
             e.preventDefault(); // Prevent default link behavior
@@ -91,8 +68,9 @@ async function handleSubmit() {
     const question = document.getElementById('question').value.trim();
     const responseDiv = document.getElementById('response');
     const responseContainer = document.getElementById('responseContainer');
+
     if (excelData.length === 0) {
-        alert('Please upload at least one Excel file');
+        alert('Please click on a Event!');
         return;
     }
 
@@ -101,20 +79,14 @@ async function handleSubmit() {
         return;
     }
 
-    // Show the response container
     if (responseContainer) {
         responseContainer.classList.remove('d-none');
     } else {
         console.error('Response container not found');
     }
 
-    // Show the spinner
-    const spinner = responseDiv.querySelector('.spinner-border');
-    if (spinner) {
-        spinner.classList.remove('d-none'); // Show the spinner
-    } else {
-        console.error('Spinner not found');
-    }
+    // Use the constant
+    responseDiv.innerHTML = SPINNER_HTML;
 
     try {
         // Fetch the token
@@ -143,12 +115,9 @@ async function handleSubmit() {
         responseDiv.innerHTML = marked.parse(data.choices[0].message.content);
     } catch (error) {
         console.error('Error:', error);
-        responseDiv.textContent = 'Error getting response from LLM';
-    } finally {
-        // Hide the spinner after the response is received
-        if (spinner) {
-            spinner.classList.add('d-none'); // Hide the spinner
-        }
+        responseDiv.innerHTML = `<div class="alert alert-danger">
+            <strong>Error:</strong> ${error.message || 'Failed to get response from LLM'}
+        </div>`;
     }
 }
 
@@ -168,23 +137,74 @@ function formatExcelDataForPrompt(excelData) {
     }).join('\n\n');
 }
 
+// Add this new function to handle dataset clicks
 async function handleDatasetClick(event) {
     const card = event.target.closest('[data-dataset]');
     if (!card) return;
     const dataset = card.getAttribute('data-dataset');
+
+    const datasetMapping = {
+        mlb: {
+            //  add the data as githubusercontent..... once the the demo is done.
+            dataFile: 'data/Copy_of_reddit_output_MLB_World_Series_2.xlsx',
+            introFile: 'questions/MLB/intro.md'
+        },
+        nba_christmas: {
+            dataFile: 'data/Copy_of_reddit_output_NBA_Christmas_1.xlsx',
+            introFile: 'questions/NBA/nba_christmas_intro.md'
+        },
+        nfl_playoffs: {
+            dataFile: 'data/Copy_of_reddit_output_NFL_Playoffs_1.xlsx',
+            introFile: 'questions/NLF/nfl_playoffs_intro.md'
+        }
+        // Add more datasets here as needed
+        // nba: {
+        //     dataFile: 'data/nba_data.xlsx',
+        //     introFile: 'questions/nba_intro.md'
+        // }
+    };
+
     try {
-        const response = await fetch('config.json');
-        const config = await response.json();
+        // First, display the intro content
+        if (datasetMapping[dataset]?.introFile) {
+            const introContainer = document.getElementById('introContainer');
+            const introContent = document.getElementById('introContent');
+            introContainer.classList.remove('d-none');
+            introContent.innerHTML = '<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>';
+
+            const introResponse = await fetch(datasetMapping[dataset].introFile);
+            if (introResponse.ok) {
+                const introContent = await introResponse.text();
+                document.getElementById('introContent').innerHTML = marked.parse(introContent);
+            }
+        }
+
+        // Then load the Excel file
+        const response = await fetch(datasetMapping[dataset].dataFile);
+        const blob = await response.blob();
+        const file = new File([blob], `${dataset}.xlsx`);
+        const data = await processExcelFile(file);
+        excelData = [{
+            filename: file.name,
+            data: data
+        }];
+
+        // Finally, load and process the config file
+        const configResponse = await fetch('config.json');
+        const config = await configResponse.json();
+
+        // Get questions for the selected dataset
         const questions = config[dataset];
-
-        // Show questions for the selected dataset
-        const predefinedQuestions = document.getElementById('predefinedQuestions');
-        predefinedQuestions.classList.remove('d-none');
-
-        // Update the questions with markdown links
-        updateQuestionsWithMarkdown(questions);
+        if (questions) {
+            // Show and update predefined questions
+            const predefinedQuestions = document.getElementById('predefinedQuestions');
+            predefinedQuestions.classList.remove('d-none');
+            updateQuestionsWithMarkdown(questions);
+        }
     } catch (error) {
-        console.error('Error loading dataset questions:', error);
+        console.error('Error loading dataset, intro, or config:', error);
+        const introContent = document.getElementById('introContent');
+        introContent.innerHTML = `<div class="alert alert-danger">Error loading content: ${error.message}</div>`;
     }
 }
 
@@ -222,11 +242,12 @@ async function handleMarkdownQuestion(event) {
     const answerFile = event.target.getAttribute('data-answer-file');
 
     try {
-        // Show spinner while loading
         const responseDiv = document.getElementById('response');
         const responseContainer = document.getElementById('responseContainer');
         responseContainer.classList.remove('d-none');
-        responseDiv.innerHTML = '<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>';
+
+        // Use the constant
+        responseDiv.innerHTML = SPINNER_HTML;
 
         const response = await fetch(answerFile);
         if (!response.ok) {
@@ -238,7 +259,6 @@ async function handleMarkdownQuestion(event) {
         responseDiv.innerHTML = marked.parse(markdownContent);
     } catch (error) {
         console.error('Error loading markdown answer:', error);
-        const responseDiv = document.getElementById('response');
         responseDiv.innerHTML = `<div class="alert alert-danger">Error loading content: ${error.message}</div>`;
     }
 }
